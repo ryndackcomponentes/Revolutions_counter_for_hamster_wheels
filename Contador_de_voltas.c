@@ -17,6 +17,7 @@
 
 //Variaveis globais
 int voltas=0;
+int voltas_total=0;
 int32_t i=0;
 int voltas_cont=0;
 float tempo=0;
@@ -35,13 +36,14 @@ void configura_timer(void);
 //da velocidade da rodinha do hamster.
 ISR(TIMER0_OVF_vect){
     i++;
-    if (i>627450){
+    if (i>624999){
 
         i=0;
 
         set = 0;
         voltas = 0;
         voltas_cont=0;
+        TCNT0 = 0;
         TCCR0B &= ~(1<<CS00);
         LCD_clear();
     }
@@ -56,6 +58,7 @@ ISR(PCINT0_vect){
     }
     else{
         voltas +=1;
+        voltas_total +=1;
         set = 1;
         tempo = i;
         i = 0;
@@ -104,7 +107,7 @@ void loop(void){
             calcula_velocidade(tempo, raio);
             if(set){
                 configura_timer();
-                sprintf(str_voltas, "Voltas: %d           ", voltas);
+                sprintf(str_voltas, "Voltas: %d           ", voltas_total-1);
                 vel_int = floor(velocidade);
                 vel_dec = 100*velocidade - 100*vel_int;
                 sprintf(str_velocidade, "Vel: %d,%d[km/h] ", vel_int, vel_dec);
@@ -124,7 +127,7 @@ void loop(void){
             }
         }
         else {
-            sprintf(str_voltas, "%d", voltas);
+            sprintf(str_voltas, "%d", voltas_total-1);
         }
     }   
 }
@@ -148,7 +151,7 @@ void configura_timer(void){
 //para segundos e calcula a velocidade em km/h.
 void calcula_velocidade(float tempo, float raio){
     if (voltas > 1){
-        tempo = 10*tempo/(627450);
+        tempo = 10*tempo/(625000);
         velocidade = 3.6*2*3.1416*raio/tempo;
     }
     else {
