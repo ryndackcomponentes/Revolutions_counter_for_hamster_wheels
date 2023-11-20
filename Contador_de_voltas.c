@@ -12,6 +12,7 @@
 #include <avr/interrupt.h>
 #include <avr/io.h>
 #include <stdbool.h>
+#include <util/delay.h>
 #include <stdio.h>
 #include "LCD.h"
 
