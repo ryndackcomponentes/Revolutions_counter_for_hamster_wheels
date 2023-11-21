@@ -112,7 +112,7 @@ void loop(void){
                 configura_timer();
                 distancia_int = floor(distancia);
                 distancia_dec = 100*(distancia-distancia_int);
-                sprintf(str_distancia, "Distancia: %d,%d[m]           ", distancia_int, distancia_dec);
+                sprintf(str_distancia, "Dis: %d,%d[m]           ", distancia_int, distancia_dec);
                 vel_int = floor(velocidade);
                 vel_dec = 100*velocidade - 100*vel_int;
                 sprintf(str_velocidade, "Vel: %d,%d[km/h] ", vel_int, vel_dec);
@@ -157,7 +157,7 @@ void configura_timer(void){
 void calcula_velocidade(float tempo, float raio){
     if (voltas > 1){
         tempo = 10*tempo/(625000);
-        distancia = (voltas_total)*2*3.1416*raio;
+        distancia = (voltas_total-1)*2*3.1416*raio;
         velocidade = 3.6*2*3.1416*raio/tempo;
     }
     else {
