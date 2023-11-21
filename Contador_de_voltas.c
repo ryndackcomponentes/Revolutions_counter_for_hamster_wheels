@@ -158,7 +158,7 @@ void calcula_velocidade(float tempo, float raio){
     if (voltas > 1){
         tempo = 10*tempo/(625000);
         distancia = (voltas_total-1)*2*3.1416*raio;
-        velocidade = 3.6*2*3.1416*raio/tempo;
+        velocidade = 3.6*2*3.141593*raio/tempo;
     }
     else {
         velocidade = 0;
