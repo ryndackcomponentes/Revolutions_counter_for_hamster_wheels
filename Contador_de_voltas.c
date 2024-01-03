@@ -11,21 +11,19 @@
 
 #include <avr/interrupt.h>
 #include <avr/io.h>
-#include <stdbool.h>
 #include <util/delay.h>
 #include <stdio.h>
 #include "LCD.h"
 
 //Variaveis globais
 int voltas=0;
-int voltas_total=0;
+int32_t voltas_total=0;
 int32_t i=0;
-int voltas_cont=0;
 float distancia=0;
 float tempo=0;
-float raio=0.2;
+float raio=0.0675;
 float velocidade=0;
-bool set;
+
 
 //protótipos das funções.
 void calcula_velocidade(float, float);
@@ -42,9 +40,8 @@ ISR(TIMER0_OVF_vect){
 
         i=0;
 
-        set = 0;
+
         voltas = 0;
-        voltas_cont=0;
         TCNT0 = 0;
         TCCR0B &= ~(1<<CS00);
     }
@@ -60,7 +57,6 @@ ISR(PCINT0_vect){
     else{
         voltas +=1;
         voltas_total +=1;
-        set = 1;
         tempo = i;
         i = 0;
 
@@ -75,10 +71,10 @@ ISR(PCINT0_vect){
 void Liga_LCD(void){
     LCD_init();
     LCD_clear();
-    LCD_move_cursor(0,3);
-    LCD_write("Contador de");
-    LCD_move_cursor(1,5);
-    LCD_write("Voltas");
+    LCD_move_cursor(0,1);
+    LCD_write("Hodometro para");
+    LCD_move_cursor(1,4);
+    LCD_write("Hamsters");
     _delay_ms(2000);
     LCD_clear();
 }
@@ -103,42 +99,25 @@ void loop(void){
     int vel_dec;
     int distancia_int;
     int distancia_dec;
+   
     while(1){
 
-        if(voltas>voltas_cont){
-
             calcula_velocidade(tempo, raio);
-            if(set){
                 configura_timer();
                 distancia_int = floor(distancia);
                 distancia_dec = 100*(distancia-distancia_int);
-                sprintf(str_distancia, "Dis: %d,%d[m]           ", distancia_int, distancia_dec);
+                sprintf(str_distancia, "Dis: %d,%d[m]   ", distancia_int, distancia_dec);
                 vel_int = floor(velocidade);
                 vel_dec = 100*velocidade - 100*vel_int;
-                sprintf(str_velocidade, "Vel: %d,%d[km/h] ", vel_int, vel_dec);
+                sprintf(str_velocidade, "Vel: %d,%d[km/h]   ", vel_int, vel_dec);
                 LCD_move_cursor(0,0);
                 LCD_write(str_distancia);
                 LCD_move_cursor(1,0);
                 LCD_write(str_velocidade);
-                voltas_cont=voltas;
-            }
-            else {
-                voltas = 0;
-                LCD_clear();
-                LCD_move_cursor(0,0);
-                LCD_write("Voltas:             ");
-                LCD_move_cursor(1,0);
-                LCD_write("Vel:                ");                
-            }
-        }
-        else {
-            sprintf(str_distancia, "%d", distancia);
-        }
     }   
 }
 
-//Inicializa o timer0 no modo de operação normal desconectado. Essa função é ativada quando a variavel set
-//possui valor lógico verdadeiro, caso ela seja falso o timer se manterá desligado.
+//Inicializa o timer0 no modo de operação normal desconectado.
 void configura_timer(void){
     TCCR0A = 0;
     TCCR0B = 0;
