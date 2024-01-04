@@ -58,9 +58,15 @@ ISR(PCINT0_vect){
         voltas +=1;
         voltas_total +=1;
         tempo = i;
+        
+
+        
         i = 0;
 
         _delay_ms(50);
+
+        TCCR0B |= (1<<CS00);
+        TCNT0 = 0;
     }
 }
 
@@ -101,19 +107,17 @@ void loop(void){
     int distancia_dec;
    
     while(1){
-
-            calcula_velocidade(tempo, raio);
-                configura_timer();
-                distancia_int = floor(distancia);
-                distancia_dec = 100*(distancia-distancia_int);
-                sprintf(str_distancia, "Dis: %d,%d[m]   ", distancia_int, distancia_dec);
-                vel_int = floor(velocidade);
-                vel_dec = 100*velocidade - 100*vel_int;
-                sprintf(str_velocidade, "Vel: %d,%d[km/h]   ", vel_int, vel_dec);
-                LCD_move_cursor(0,0);
-                LCD_write(str_distancia);
-                LCD_move_cursor(1,0);
-                LCD_write(str_velocidade);
+        calcula_velocidade(tempo, raio);
+        distancia_int = floor(distancia);
+        distancia_dec = 100*(distancia-distancia_int);
+        sprintf(str_distancia, "Dis: %d,%d[m]   ", distancia_int, distancia_dec);
+        vel_int = floor(velocidade);
+        vel_dec = 100*velocidade - 100*vel_int;
+        sprintf(str_velocidade, "Vel: %d,%d[km/h]   ", vel_int, vel_dec);
+        LCD_move_cursor(0,0);
+        LCD_write(str_distancia);
+        LCD_move_cursor(1,0);
+        LCD_write(str_velocidade);
     }   
 }
 
@@ -121,12 +125,6 @@ void loop(void){
 void configura_timer(void){
     TCCR0A = 0;
     TCCR0B = 0;
-
-    TCCR0B |= (1<<CS00);
-    
-
-    TCNT0 = 0;
-
     TIMSK0 |= (1<<TOIE0);
 
 }
@@ -135,7 +133,7 @@ void configura_timer(void){
 //para segundos e calcula a velocidade em km/h.
 void calcula_velocidade(float tempo, float raio){
     if (voltas > 1){
-        tempo = 10*tempo/(625000);
+        tempo = tempo/(62500);
         distancia = (voltas_total-1)*2*3.1416*raio;
         velocidade = 3.6*2*3.141593*raio/tempo;
     }
